@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: bgmi-app
+    env: python
+    plan: free
+    buildCommand: ./deploy.sh
+    startCommand: ./bin/bgmi & ./venv/bin/python a.py
