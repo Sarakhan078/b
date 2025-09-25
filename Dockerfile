@@ -1,18 +1,33 @@
+# Use official Python image
 FROM python:3.12-slim
 
-# Working directory
+# Set working directory
 WORKDIR /app
 
-# Copy repo files
-COPY . .
+# Install build tools for compiling C code
+RUN apt-get update && \
+    apt-get install -y gcc make build-essential && \
+    rm -rf /var/lib/apt/lists/*
 
-# Create bin folder and compile C binary
-RUN mkdir -p bin && gcc raj.c -o bin/bgmi -pthread -O2 -lm && chmod +x bin/bgmi
+# Copy project files
+COPY . /app
 
-# Setup venv & install dependencies
-RUN python3 -m venv venv && \
-    venv/bin/pip install --upgrade pip && \
-    venv/bin/pip install -r requirements.txt
+# Create virtual environment
+RUN python -m venv /app/venv
 
-# Start both bgmi binary and Python script
-CMD ["sh", "-c", "./bin/bgmi & ./venv/bin/python a.py"]
+# Upgrade pip
+RUN /app/venv/bin/pip install --upgrade pip
+
+# Install Python dependencies
+RUN /app/venv/bin/pip install -r requirements.txt
+
+# Compile raj.c to binary
+RUN mkdir -p /app/bin && \
+    gcc /app/raj.c -o /app/bin/bgmi -lm && \
+    chmod +x /app/bin/bgmi
+
+# Set environment variables for Python
+ENV PATH="/app/venv/bin:$PATH"
+
+# Command to run bgmi binary and a.py script
+CMD ["/bin/bash", "-c", "/app/bin/bgmi & python /app/a.py"]
