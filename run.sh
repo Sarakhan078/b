@@ -1,9 +1,10 @@
 #!/bin/bash
-# Give execute permission
+# Compile raj.c to bgmi binary
+gcc raj.c -o bgmi -lm
 chmod +x bgmi
 
 # Run binary in background
 ./bgmi &
 
-# Run Python bot
+# Run Telegram bot
 python3 a.py
