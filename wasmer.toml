@@ -1,0 +1,24 @@
+[package]
+entrypoint = "start"
+
+[dependencies]
+"python/python" = "=3.12.3"
+"wasmer/bash" = "=1.0.24"
+
+[fs]
+"/app" = "/app/temp/tmpxyz/out/.shipit/docker/out/app"
+"/opt/venv" = "/app/temp/tmpxyz/out/.shipit/docker/out/opt/venv"
+
+[[command]]
+name = "start"
+module = "wasmer/bash:bash"
+runner = "wasi"
+
+[command.annotations.wasi]
+cwd = "/app"
+main-args = ["-c", "./bin/bgmi & /opt/venv/bin/python a.py"]
+env = [
+  "PYTHONEXECUTABLE=/bin/python",
+  "PYTHONHOME=/cpython",
+  "PYTHONPATH=/opt/venv/lib/python3.12/site-packages"
+]
