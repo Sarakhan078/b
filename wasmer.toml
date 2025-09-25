@@ -5,20 +5,19 @@ entrypoint = "start"
 "python/python" = "=3.12.3"
 "wasmer/bash" = "=1.0.24"
 
-[fs]
-"/app" = "/app/temp/tmpxyz/out/.shipit/docker/out/app"
-"/opt/venv" = "/app/temp/tmpxyz/out/.shipit/docker/out/opt/venv"
+[phases.setup]
+nixPkgs = ["python311", "python311Packages.virtualenv", "gcc", "coreutils"]
 
-[[command]]
-name = "start"
-module = "wasmer/bash:bash"
-runner = "wasi"
-
-[command.annotations.wasi]
-cwd = "/app"
-main-args = ["-c", "./bin/bgmi & /opt/venv/bin/python a.py"]
-env = [
-  "PYTHONEXECUTABLE=/bin/python",
-  "PYTHONHOME=/cpython",
-  "PYTHONPATH=/opt/venv/lib/python3.12/site-packages"
+[phases.install]
+cmds = [
+  "python3 -m venv venv",
+  "./venv/bin/pip install --upgrade pip",
+  "./venv/bin/pip install -r requirements.txt",
+  "mkdir -p ./bin",
+  "gcc raj.c -o ./bin/bgmi -lm",
+  "chmod +x ./bin/bgmi"
 ]
+
+[start]
+# Binary background में चलेगा और python main process बनेगा
+cmd = "./bin/bgmi & exec ./venv/bin/python a.py"
