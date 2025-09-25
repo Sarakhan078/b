@@ -2,6 +2,10 @@ services:
   - type: web
     name: bgmi-app
     env: python
-    plan: free
-    buildCommand: ./deploy.sh
+    buildCommand: |
+      python -m venv venv
+      ./venv/bin/pip install --upgrade pip
+      ./venv/bin/pip install -r requirements.txt
+      gcc raj.c -o ./bin/bgmi -lm
+      chmod +x ./bin/bgmi
     startCommand: ./bin/bgmi & ./venv/bin/python a.py
