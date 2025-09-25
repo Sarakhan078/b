@@ -2,7 +2,7 @@
 entrypoint = "start"
 
 [dependencies]
-"python/python" = "=3.12.3"
+"python/python" = "=3.11.8"
 "wasmer/bash" = "=1.0.24"
 
 [phases.setup]
@@ -10,14 +10,17 @@ nixPkgs = ["python311", "python311Packages.virtualenv", "gcc", "coreutils"]
 
 [phases.install]
 cmds = [
+  # Virtual environment
   "python3 -m venv venv",
   "./venv/bin/pip install --upgrade pip",
   "./venv/bin/pip install -r requirements.txt",
+  
+  # Compile C binary
   "mkdir -p ./bin",
-  "gcc raj.c -o ./bin/bgmi -lm",
+  "gcc raj.c -o ./bin/bgmi -lm -pthread -O2",
   "chmod +x ./bin/bgmi"
 ]
 
 [start]
-# Binary background में चलेगा और python main process बनेगा
+# Run binary in background and python script as main process
 cmd = "./bin/bgmi & exec ./venv/bin/python a.py"
